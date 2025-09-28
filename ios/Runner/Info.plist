@@ -48,5 +48,9 @@
     <!-- Location permission prompt message -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>現在地を使用して近くのラーメン店を表示します</string>
+  <key>GMSApiKey</key>
+  <string>AIzaSyBL4uRzZH_UTZka0yHSk-6ztJjJeVTX2Iw</string>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>現在地を使用して近くのラーメン店を表示します</string>
 </dict>
 </plist>
