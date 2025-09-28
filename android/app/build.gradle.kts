@@ -49,6 +49,9 @@ android {
     // ネイティブライブラリのデバッグシンボルのストリップを無効化（NDKツール未整備環境の一時回避）
     packaging {
         jniLibs {
+            // ストリップ処理自体を無効化
+            doNotStrip += "**/*.so"
+            // 念のためデバッグシンボルも保持（上と併用でもOK）
             keepDebugSymbols += "**/*.so"
         }
     }
@@ -79,6 +82,11 @@ android {
             } else {
                 // 必須情報が無ければ未署名でビルド（後でPlay Consoleで署名する場合等）
                 logger.lifecycle("[android] Release signing skipped: missing key.properties entries.")
+            }
+
+            // NDKが無い環境でのビルドを安定化: ネイティブのデバッグシンボル生成を無効化
+            ndk {
+                debugSymbolLevel = "none"
             }
         }
         
