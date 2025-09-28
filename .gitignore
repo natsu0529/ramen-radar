@@ -1,6 +1,9 @@
 # Dart & Flutter
 .dart_tool/
 .packages
+.metadata
+.flutter-plugins
+.flutter-plugins-dependencies
 
 # Flutter build outputs
 build/
@@ -30,6 +33,10 @@ web/.dart_tool/
 # VSCode & IntelliJ
 .vscode/
 .idea/
+*.iml
+
+# macOS Finder
+.DS_Store
 
 # Env
 .env
