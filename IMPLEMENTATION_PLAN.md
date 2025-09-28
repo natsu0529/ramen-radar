@@ -85,20 +85,20 @@
 - [x] ドメイン設計（初期簡易実装）
   - [x] Entity: `Place`, `RankingEntry`, `RamenTag`（`lib/models.dart`）
   - [x] ValueObject/Enum: `Genre`（ALL/IEKEI/JIRO）
-  - [ ] DTO と相互変換（Freezed/Json）
+  - [x] DTO と相互変換（Freezed/Json）
 - [ ] リポジトリ設計
   - [ ] `PlaceRepository`（検索/詳細取得）
   - [ ] `DistanceRepository`（距離取得）
   - [ ] `GeocodingRepository`（任意）
-- [ ] データソース
-  - [ ] Places API クライアント（キーワード/半径/型の設計）
-  - [ ] Distance Matrix API クライアント（距離取得/バッチ化）
+ - [ ] データソース
+  - [x] Places API クライアント（キーワード/半径/型の設計）
+  - [x] Distance Matrix API クライアント（距離取得/バッチ化）
   
  進捗（実装）
 - [x] Google API リポジトリ実装（`GoogleRankingRepository`）
 - [x] Places API/Distance Matrix API クライアント（`google_apis.dart`）
 - [ ] Geocoding API（未）
-- [ ] DTO（Freezed/Json）（未・現状は手動パース）
+- [x] DTO（Freezed/Json）
 - [x] スコアリング
   - [x] 距離の丸め（有効数字2桁。1km未満はそのまま）
   - [x] `総合スコア = (rating × 2) − distance(km)` のユースケース
@@ -116,7 +116,7 @@
   - [x] Home（ジャンル切替: ALL/IEKEI/JIRO）
   - [x] ランキングリスト（スコア/距離/タグ表示）
   - [x] 地図ビュー（ピン表示）
-  - [ ] 詳細モーダル or 詳細画面（任意）
+  - [x] 詳細モーダル（ボトムシート）
  - [x] 地図とリストのシームレス切替（トグル）
  - [x] スポット評価（上位10の平均 → S/A/B/C/D 表示）
  - [x] ローディング/エラーステート（再試行/権限誘導）
@@ -129,7 +129,8 @@
 - [x] `gen_l10n` 設定（`flutter_localizations`/`l10n.yaml`）
 - [x] 文言分離・多言語リソース整備（ja/en から開始）
 - [x] テーマ基盤（`shared/theme/app_theme.dart`）
-- [ ] アクセシビリティ（フォントサイズ/コントラスト/タップ領域）
+- [x] アクセシビリティ（主要操作の Semantics ラベル付与）
+- [ ] フォントサイズ/コントラスト/タップ領域の最適化
 
 ---
 
@@ -150,9 +151,9 @@
   - [ ] ジャンルフィルタの判定
 - [ ] ウィジェットテスト
   - [x] リスト表示（データ反映）
-  - [ ] 地図切替の状態遷移
-  - [ ] ローディング/エラー表示
-- [ ] リポジトリのモックテスト（API 失敗/欠損）
+  - [x] 地図切替の状態遷移（ビルダー差し替えで検証）
+  - [x] ローディング/エラー表示（位置権限/ランキング取得失敗）
+  - [ ] リポジトリのモックテスト（欠損/エッジケース）
 
 ---
 
@@ -207,7 +208,7 @@
 - [ ] Distance Matrix 距離取得（バッチ）
 
 5) ドメイン/ユースケース
-- [ ] DTO/Entity 生成（Freezed/Json）
+- [x] DTO/Entity 生成（Freezed/Json）
 - [x] スコアリング/並び替え/10件抽出
 - [x] スポット評価（S/A/B/C/D）
 

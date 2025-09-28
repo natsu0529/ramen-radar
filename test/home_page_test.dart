@@ -49,7 +49,7 @@ void main() {
     final overrides = <Override>[
       rankingRepositoryProvider.overrideWith((ref) => _TestRankingRepo()),
       currentLocationProvider.overrideWith((ref) async => const LatLng(35.0, 139.0)),
-      mapWidgetBuilderProvider.overrideWith((ref) => ({required current, required entries}) => Container(key: const Key('test-map'))),
+      mapWidgetBuilderProvider.overrideWith((ref) => ({required current, required entries, required onSelect}) => Container(key: const Key('test-map'))),
     ];
 
     await tester.pumpWidget(ProviderScope(

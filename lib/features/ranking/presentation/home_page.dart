@@ -7,6 +7,7 @@ import '../../../scoring.dart';
 import '../../../shared/di/providers.dart';
 import '../../../shared/utils/location_service.dart';
 import 'map_widget.dart';
+import 'place_detail_sheet.dart';
 
 final genreProvider = StateProvider<Genre>((ref) => Genre.all);
 enum ViewMode { list, map }
@@ -52,8 +53,12 @@ class HomePage extends ConsumerWidget {
             child: loc.when(
               data: (pos) => ranking.when(
                 data: (list) => viewMode == ViewMode.list
-                    ? _RankingList(entries: list)
-                    : ref.watch(mapWidgetBuilderProvider)(current: pos, entries: list),
+                    ? _RankingList(entries: list, onSelect: (e) => showPlaceDetailSheet(context, e))
+                    : ref.watch(mapWidgetBuilderProvider)(
+                        current: pos,
+                        entries: list,
+                        onSelect: (e) => showPlaceDetailSheet(context, e),
+                      ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => _ErrorView(
                   message: '${AppLocalizations.of(context)!.errorRankingFetch}\n$e',
@@ -107,8 +112,9 @@ class _GenreChips extends StatelessWidget {
 }
 
 class _RankingList extends StatelessWidget {
-  const _RankingList({required this.entries});
+  const _RankingList({required this.entries, required this.onSelect});
   final List<RankingEntry> entries;
+  final void Function(RankingEntry) onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -132,13 +138,19 @@ class _RankingList extends StatelessWidget {
             separatorBuilder: (_, __) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final e = entries[index];
-              return ListTile(
-                leading: CircleAvatar(child: Text('${index + 1}')),
-                title: Text(e.place.name),
-                subtitle: Text(
-                  '${AppLocalizations.of(context)!.rating(e.place.rating.toStringAsFixed(1))}・${AppLocalizations.of(context)!.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
+              return Semantics(
+                label:
+                    '${e.place.name}, ${AppLocalizations.of(context)!.rating(e.place.rating.toStringAsFixed(1))}, ${AppLocalizations.of(context)!.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
+                button: true,
+                child: ListTile(
+                  leading: CircleAvatar(child: Text('${index + 1}')),
+                  title: Text(e.place.name),
+                  subtitle: Text(
+                    '${AppLocalizations.of(context)!.rating(e.place.rating.toStringAsFixed(1))}・${AppLocalizations.of(context)!.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
+                  ),
+                  trailing: Text(e.score.toStringAsFixed(2)),
+                  onTap: () => onSelect(e),
                 ),
-                trailing: Text(e.score.toStringAsFixed(2)),
               );
             },
           ),

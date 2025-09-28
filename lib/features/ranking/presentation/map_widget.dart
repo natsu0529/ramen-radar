@@ -3,9 +3,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 
 import '../../../models.dart';
 
-typedef MapWidgetBuilder = Widget Function({required LatLng current, required List<RankingEntry> entries});
+typedef MapWidgetBuilder = Widget Function({
+  required LatLng current,
+  required List<RankingEntry> entries,
+  required void Function(RankingEntry entry) onSelect,
+});
 
-Widget defaultMapWidgetBuilder({required LatLng current, required List<RankingEntry> entries}) {
+Widget defaultMapWidgetBuilder({
+  required LatLng current,
+  required List<RankingEntry> entries,
+  required void Function(RankingEntry entry) onSelect,
+}) {
   final markers = entries
       .map((e) => gmap.Marker(
             markerId: gmap.MarkerId(e.place.id),
@@ -13,6 +21,7 @@ Widget defaultMapWidgetBuilder({required LatLng current, required List<RankingEn
             infoWindow: gmap.InfoWindow(
               title: e.place.name,
               snippet: '★${e.place.rating.toStringAsFixed(1)} / ${e.roundedDistanceKm.toStringAsFixed(2)}km / ${e.score.toStringAsFixed(2)}',
+              onTap: () => onSelect(e),
             ),
           ))
       .toSet();
@@ -29,4 +38,3 @@ Widget defaultMapWidgetBuilder({required LatLng current, required List<RankingEn
     mapToolbarEnabled: false,
   );
 }
-

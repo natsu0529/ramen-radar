@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 
 import '../../../models.dart';
+import 'dto/places_dto.dart';
+import 'dto/distance_matrix_dto.dart';
 
 class GooglePlacesApi {
   GooglePlacesApi(this._dio, {required this.apiKey});
@@ -31,27 +33,24 @@ class GooglePlacesApi {
         'language': 'ja',
       },
     );
-
     final data = resp.data as Map<String, dynamic>;
-    final results = (data['results'] as List?) ?? [];
-    return results.map((e) => _placeFromJson(e as Map<String, dynamic>)).where((p) => p != null).cast<Place>().toList();
+    final dto = PlacesNearbyResponse.fromJson(data);
+    return dto.results.map(_placeFromDto).whereType<Place>().toList();
   }
 
-  Place? _placeFromJson(Map<String, dynamic> json) {
-    final id = json['place_id'] as String?;
-    final name = json['name'] as String?;
-    final rating = (json['rating'] as num?)?.toDouble() ?? 0.0;
-    final loc = ((json['geometry'] as Map?)?['location'] as Map?) ?? {};
-    final lat = (loc['lat'] as num?)?.toDouble();
-    final lng = (loc['lng'] as num?)?.toDouble();
-    if (id == null || name == null || lat == null || lng == null) return null;
+  Place? _placeFromDto(PlaceResult r) {
+    final id = r.placeId;
+    final name = r.name;
+    final rating = r.rating ?? 0.0;
+    final lat = r.geometry.location.lat;
+    final lng = r.geometry.location.lng;
 
     final tags = <RamenTag>[];
-    final nameLower = name.toLowerCase();
-    if (nameLower.contains('家系')) tags.add(RamenTag.iekei);
-    if (nameLower.contains('二郎')) tags.add(RamenTag.jiro);
-    if (nameLower.contains('味噌')) tags.add(RamenTag.miso);
-    if (nameLower.contains('豚骨') || nameLower.contains('とんこつ')) tags.add(RamenTag.tonkotsu);
+    final nameForMatch = name; // Japanese: case-insensitive not meaningful; keep raw
+    if (nameForMatch.contains('家系')) tags.add(RamenTag.iekei);
+    if (nameForMatch.contains('二郎')) tags.add(RamenTag.jiro);
+    if (nameForMatch.contains('味噌')) tags.add(RamenTag.miso);
+    if (nameForMatch.contains('豚骨') || nameForMatch.contains('とんこつ')) tags.add(RamenTag.tonkotsu);
 
     return Place(
       id: id,
@@ -87,15 +86,13 @@ class GoogleDistanceMatrixApi {
       },
     );
     final data = resp.data as Map<String, dynamic>;
-    final rows = (data['rows'] as List?) ?? [];
-    if (rows.isEmpty) return List.filled(destinations.length, double.nan);
-    final elements = (rows.first as Map)['elements'] as List? ?? [];
-    return elements.map((e) {
-      final el = e as Map<String, dynamic>;
-      if (el['status'] != 'OK') return double.nan;
-      final meters = (el['distance'] as Map)['value'] as num;
+    final dto = DistanceMatrixResponse.fromJson(data);
+    if (dto.rows.isEmpty) return List.filled(destinations.length, double.nan);
+    final elements = dto.rows.first.elements;
+    return elements.map((el) {
+      if (el.status != 'OK' || el.distance == null) return double.nan;
+      final meters = el.distance!.value;
       return meters.toDouble() / 1000.0;
     }).toList();
   }
 }
-
