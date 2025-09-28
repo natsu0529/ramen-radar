@@ -8,7 +8,8 @@ plugins {
 android {
     namespace = "com.example.ramen_radar"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Pin NDK to satisfy plugins requiring 27.0.12077973 (backward compatible)
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -27,18 +27,20 @@ Widget defaultMapWidgetBuilder({
           ))
       .toSet();
 
-  return Semantics(
-    label: AppLocalizations.of(context)!.mapViewA11y(entries.length.toString()),
-    child: gmap.GoogleMap(
-      initialCameraPosition: gmap.CameraPosition(
-        target: gmap.LatLng(current.lat, current.lng),
-        zoom: 14,
+  return Builder(builder: (context) {
+    return Semantics(
+      label: AppLocalizations.of(context)!.mapViewA11y(entries.length.toString()),
+      child: gmap.GoogleMap(
+        initialCameraPosition: gmap.CameraPosition(
+          target: gmap.LatLng(current.lat, current.lng),
+          zoom: 14,
+        ),
+        markers: markers,
+        myLocationButtonEnabled: false,
+        myLocationEnabled: false,
+        compassEnabled: true,
+        mapToolbarEnabled: false,
       ),
-      markers: markers,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: false,
-      compassEnabled: true,
-      mapToolbarEnabled: false,
-    ),
-  );
+    );
+  });
 }

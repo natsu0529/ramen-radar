@@ -214,6 +214,8 @@ class _RankingList extends StatelessWidget {
     );
 }
 
+}
+
 class _ViewToggle extends StatelessWidget {
   const _ViewToggle({required this.mode, required this.onChanged});
   final ViewMode mode;
@@ -294,6 +296,8 @@ String _tagLabel(RamenTag t) {
       return '豚骨';
   }
 }
+
+String _fmtDistance(double km) => km.toStringAsFixed(1);
 
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});

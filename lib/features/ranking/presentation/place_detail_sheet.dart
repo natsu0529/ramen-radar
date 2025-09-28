@@ -62,6 +62,8 @@ class PlaceDetailSheet extends StatelessWidget {
   }
 }
 
+String _fmtDistance(double km) => km.toStringAsFixed(1);
+
 class _TagsRow extends StatelessWidget {
   const _TagsRow({required this.tags});
   final List<RamenTag> tags;

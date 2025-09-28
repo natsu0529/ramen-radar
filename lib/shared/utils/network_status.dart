@@ -1,12 +1,13 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final connectivityProvider = StreamProvider<ConnectivityResult>((ref) {
+// connectivity_plus v6 emits Stream<List<ConnectivityResult>>
+final connectivityProvider = StreamProvider<List<ConnectivityResult>>((ref) {
   final connectivity = Connectivity();
   return connectivity.onConnectivityChanged;
 });
 
-bool isOffline(ConnectivityResult r) {
-  return r == ConnectivityResult.none;
+bool isOffline(List<ConnectivityResult> r) {
+  if (r.isEmpty) return true;
+  return r.every((e) => e == ConnectivityResult.none);
 }
-

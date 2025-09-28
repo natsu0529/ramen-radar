@@ -1,8 +1,10 @@
+import 'dart:math' as MathCore;
+
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../models.dart';
-import '../../shared/utils/ttl_cache.dart';
+import 'package:ramen_radar/shared/utils/ttl_cache.dart';
 import '../domain/ranking_repository.dart';
 import 'google_apis.dart';
 
@@ -101,6 +103,3 @@ class Maths {
   static double atan2(double y, double x) => MathCore.atan2(y, x);
   static double sqrt(num x) => MathCore.sqrt(x);
 }
-
-// ignore: library_prefixes
-import 'dart:math' as MathCore;

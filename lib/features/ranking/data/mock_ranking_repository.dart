@@ -1,3 +1,5 @@
+import 'dart:math' as MathCore;
+
 import '../../../models.dart';
 import '../domain/ranking_repository.dart';
 
@@ -57,7 +59,4 @@ class Maths {
   static double atan2(double y, double x) => MathCore.atan2(y, x);
   static double sqrt(num x) => MathCore.sqrt(x);
 }
-
-// ignore: library_prefixes
-import 'dart:math' as MathCore;
 
