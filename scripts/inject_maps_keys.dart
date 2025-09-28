@@ -9,7 +9,7 @@ import 'dart:io';
 // Reads GOOGLE_MAPS_API_KEY from environment variables or .env (if present),
 // and updates:
 //   - android/app/src/main/AndroidManifest.xml: <meta-data ... API KEY>
-//   - android/app/build.gradle: manifestPlaceholders (MAPS_API_KEY)
+//   - android/app/build.gradle (Groovy only): manifestPlaceholders (MAPS_API_KEY)
 //   - ios/Runner/Info.plist: GMSApiKey and location usage description
 //   - web/index.html: <script src="https://maps.googleapis.com/maps/api/js?key=...">
 
@@ -54,34 +54,38 @@ Future<String?> _loadApiKey() async {
 
 Future<void> _patchAndroid(String key) async {
   final manifest = File('android/app/src/main/AndroidManifest.xml');
-  final gradle = File('android/app/build.gradle');
-  if (!await manifest.exists() || !await gradle.exists()) {
-    stdout.writeln('[inject_maps_keys][android] スキップ（android プロジェクトが見つかりません）');
+  final gradleGroovy = File('android/app/build.gradle');
+  final gradleKts = File('android/app/build.gradle.kts');
+  if (!await manifest.exists()) {
+    stdout.writeln('[inject_maps_keys][android] スキップ（AndroidManifest.xml が見つかりません）');
     return;
   }
 
   // Patch AndroidManifest.xml: add meta-data if missing
   var manifestText = await manifest.readAsString();
-  const metaLine = '<meta-data android:name="com.google.android.geo.API_KEY" android:value="
-';
+  const placeholder = '__MAPS_API_KEY__';
   if (!manifestText.contains('com.google.android.geo.API_KEY')) {
     manifestText = manifestText.replaceFirst(
       '</application>',
-      '    <meta-data android:name="com.google.android.geo.API_KEY" android:value="
-${''}MAPS_API_KEY${''}" />\n  </application>',
+      '    <meta-data android:name="com.google.android.geo.API_KEY" android:value="' + placeholder + '" />\n  </application>',
     );
   }
-  await manifest.writeAsString(manifestText.replaceAll('${''}MAPS_API_KEY${''}', key));
+  manifestText = manifestText.replaceAll(placeholder, key);
+  await manifest.writeAsString(manifestText);
 
-  // Patch build.gradle: add manifestPlaceholders
-  var gradleText = await gradle.readAsString();
-  if (!gradleText.contains('manifestPlaceholders')) {
-    gradleText = gradleText.replaceFirst(
-      RegExp(r'defaultConfig\s*\{'),
-      'defaultConfig {\n        manifestPlaceholders = [ MAPS_API_KEY: System.getenv("GOOGLE_MAPS_API_KEY") ?: project.findProperty("MAPS_API_KEY") ?: "${_escapeGradle(key)}" ]',
-    );
+  // Patch build.gradle (Groovy) when present. KTS は通知のみ。
+  if (await gradleGroovy.exists()) {
+    var gradleText = await gradleGroovy.readAsString();
+    if (!gradleText.contains('manifestPlaceholders')) {
+      gradleText = gradleText.replaceFirst(
+        RegExp(r'defaultConfig\s*\{'),
+        'defaultConfig {\n        manifestPlaceholders = [ MAPS_API_KEY: System.getenv("GOOGLE_MAPS_API_KEY") ?: project.findProperty("MAPS_API_KEY") ?: "${_escapeGradle(key)}" ]',
+      );
+      await gradleGroovy.writeAsString(gradleText);
+    }
+  } else if (await gradleKts.exists()) {
+    stdout.writeln('[inject_maps_keys][android] build.gradle.kts を検出。manifestPlaceholders は手動で設定してください。');
   }
-  await gradle.writeAsString(gradleText);
 
   stdout.writeln('[inject_maps_keys][android] 更新しました');
 }
@@ -105,7 +109,11 @@ Future<void> _patchIOS(String key) async {
   stdout.writeln('[inject_maps_keys][ios] 更新しました');
 }
 
-String _xmlEscape(String v) => v.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+String _xmlEscape(String v) => v
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 
 Future<void> _patchWeb(String key) async {
   final index = File('web/index.html');
@@ -124,5 +132,9 @@ Future<void> _patchWeb(String key) async {
   stdout.writeln('[inject_maps_keys][web] 更新しました');
 }
 
-String _htmlEscape(String v) => v.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+String _htmlEscape(String v) => v
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 
