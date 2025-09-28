@@ -12,9 +12,14 @@
   "errorRankingFetch": "Failed to fetch ranking",
   "retry": "Retry",
   "openSettings": "Open Settings",
+  "openInMaps": "Open in Maps",
   "errorLocationServiceDisabled": "Location service is disabled. Please enable it in system settings.",
   "errorPermissionDenied": "Location permission denied. Please allow it.",
   "errorPermissionDeniedForever": "Location permission permanently denied. Please allow it in Settings.",
   "errorTimeout": "Getting current location timed out. Please retry.",
-  "errorLocationGeneric": "Failed to get current location"
+  "errorLocationGeneric": "Failed to get current location",
+  "offline": "Offline",
+  "showingLastResults": "Showing last results",
+  "mapViewA11y": "Map view with {count} results",
+  "refresh": "Refresh"
 }

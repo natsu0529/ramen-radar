@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 
 import '../../../models.dart';
@@ -26,15 +27,18 @@ Widget defaultMapWidgetBuilder({
           ))
       .toSet();
 
-  return gmap.GoogleMap(
-    initialCameraPosition: gmap.CameraPosition(
-      target: gmap.LatLng(current.lat, current.lng),
-      zoom: 14,
+  return Semantics(
+    label: AppLocalizations.of(context)!.mapViewA11y(entries.length.toString()),
+    child: gmap.GoogleMap(
+      initialCameraPosition: gmap.CameraPosition(
+        target: gmap.LatLng(current.lat, current.lng),
+        zoom: 14,
+      ),
+      markers: markers,
+      myLocationButtonEnabled: false,
+      myLocationEnabled: false,
+      compassEnabled: true,
+      mapToolbarEnabled: false,
     ),
-    markers: markers,
-    myLocationButtonEnabled: false,
-    myLocationEnabled: false,
-    compassEnabled: true,
-    mapToolbarEnabled: false,
   );
 }

@@ -12,6 +12,11 @@ class RamenRadarApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ramen Radar',
       theme: appTheme(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.redAccent, brightness: Brightness.dark),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

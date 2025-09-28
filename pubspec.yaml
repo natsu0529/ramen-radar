@@ -36,6 +36,12 @@ dependencies:
   # Networking
   dio: ^5.7.0
 
+  # External intents
+  url_launcher: ^6.3.1
+
+  # Connectivity
+  connectivity_plus: ^6.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../models.dart';
 
@@ -17,7 +18,9 @@ class PlaceDetailSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Semantics(
+              header: true,
+              child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(child: Text(entry.score.toStringAsFixed(1))),
@@ -33,9 +36,25 @@ class PlaceDetailSheet extends StatelessWidget {
                   ),
                 ),
               ],
+              ),
             ),
             const SizedBox(height: 12),
             if (entry.place.tags.isNotEmpty) _TagsRow(tags: entry.place.tags),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _openInMaps(entry.place.location),
+                  icon: const Icon(Icons.map_outlined),
+                  label: Text(t.openInMaps),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -76,4 +95,11 @@ void showPlaceDetailSheet(BuildContext context, RankingEntry e) {
     showDragHandle: true,
     builder: (_) => PlaceDetailSheet(entry: e),
   );
+}
+
+Future<void> _openInMaps(LatLng loc) async {
+  final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}');
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
 }
