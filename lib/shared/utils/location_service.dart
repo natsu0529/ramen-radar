@@ -43,5 +43,9 @@ class LocationService {
   Future<void> openAppSettings() async {
     await ph.openAppSettings();
   }
-}
 
+  /// Open device location settings (to enable GPS/services).
+  Future<void> openLocationSettings() async {
+    await Geolocator.openLocationSettings();
+  }
+}

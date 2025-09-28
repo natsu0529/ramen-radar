@@ -37,6 +37,12 @@ class HomePage extends ConsumerWidget {
     final viewMode = ref.watch(viewModeProvider);
     final loc = ref.watch(currentLocationProvider);
     final ranking = ref.watch(rankingProvider);
+    // Cache the last successful ranking result via a listener to avoid modifying providers during build.
+    ref.listen<AsyncValue<List<RankingEntry>>>(rankingProvider, (prev, next) {
+      next.whenData((list) {
+        ref.read(lastRankingProvider.notifier).state = list;
+      });
+    });
     final connectivity = ref.watch(connectivityProvider).value;
     final offline = connectivity != null && isOffline(connectivity);
     final lastRanking = ref.watch(lastRankingProvider);
@@ -72,8 +78,6 @@ class HomePage extends ConsumerWidget {
             child: loc.when(
               data: (pos) => ranking.when(
                 data: (list) {
-                  // cache last successful result
-                  ref.read(lastRankingProvider.notifier).state = list;
                   return viewMode == ViewMode.list
                     ? _RankingList(entries: list, onSelect: (e) => showPlaceDetailSheet(context, e))
                     : ref.watch(mapWidgetBuilderProvider)(
@@ -104,7 +108,12 @@ class HomePage extends ConsumerWidget {
               error: (e, st) => _LocationErrorView(error: e, onRetry: () {
                 ref.invalidate(currentLocationProvider);
               }, onOpenSettings: () async {
-                await ref.read(locationServiceProvider).openAppSettings();
+                final svc = ref.read(locationServiceProvider);
+                if (e is LocationException && e.code == 'service_disabled') {
+                  await svc.openLocationSettings();
+                } else {
+                  await svc.openAppSettings();
+                }
               }),
             ),
           ),
