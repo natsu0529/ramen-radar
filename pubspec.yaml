@@ -1,6 +1,6 @@
 name: ramen_radar
 description: Ramen Radar app per README plan.
-version: 0.1.0
+version: 0.1.0+2
 publish_to: 'none'
 
 environment:
