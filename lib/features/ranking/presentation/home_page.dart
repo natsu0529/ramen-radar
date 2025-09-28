@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../models.dart';
 import '../../../scoring.dart';
 import '../../../shared/di/providers.dart';
 import '../../../shared/utils/location_service.dart';
+import 'map_widget.dart';
 
 final genreProvider = StateProvider<Genre>((ref) => Genre.all);
 enum ViewMode { list, map }
@@ -53,7 +53,7 @@ class HomePage extends ConsumerWidget {
               data: (pos) => ranking.when(
                 data: (list) => viewMode == ViewMode.list
                     ? _RankingList(entries: list)
-                    : _MapView(current: pos, entries: list),
+                    : ref.watch(mapWidgetBuilderProvider)(current: pos, entries: list),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => _ErrorView(
                   message: '${AppLocalizations.of(context)!.errorRankingFetch}\n$e',
@@ -169,42 +169,7 @@ class _ViewToggle extends StatelessWidget {
   }
 }
 
-class _MapView extends StatelessWidget {
-  const _MapView({required this.current, required this.entries});
-  final LatLng current;
-  final List<RankingEntry> entries;
-
-  @override
-  Widget build(BuildContext context) {
-    final markers = entries.map((e) {
-      return gmap.Marker(
-        markerId: gmap.MarkerId(e.place.id),
-        position: gmap.LatLng(e.place.location.lat, e.place.location.lng),
-        infoWindow: gmap.InfoWindow(
-          title: e.place.name,
-          snippet: '★${e.place.rating.toStringAsFixed(1)}  距離 ${_fmtDistance(e.roundedDistanceKm)}km  点 ${e.score.toStringAsFixed(2)}',
-        ),
-      );
-    }).toSet();
-
-    return gmap.GoogleMap(
-      initialCameraPosition: gmap.CameraPosition(
-        target: gmap.LatLng(current.lat, current.lng),
-        zoom: 14,
-      ),
-      markers: markers,
-      myLocationButtonEnabled: false,
-      myLocationEnabled: false,
-      compassEnabled: true,
-      mapToolbarEnabled: false,
-    );
-  }
-
-  String _fmtDistance(double km) {
-    if (km < 1.0) return km.toStringAsFixed(2);
-    return km.toStringAsFixed(2);
-  }
-}
+// Map rendering moved to map_widget.dart and is overridable via Provider for testing.
 
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});

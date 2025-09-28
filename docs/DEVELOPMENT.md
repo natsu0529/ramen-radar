@@ -89,6 +89,16 @@ fvm flutter devices
 fvm flutter run -d <device-id>
 ```
 
+## Google API 実装の切替（任意）
+
+デフォルトはモックデータを使用します。Google API 実装を使用する場合は、`dart-define` を指定してください。
+
+```bash
+fvm flutter run --dart-define=USE_GOOGLE_API=true -d <device-id>
+```
+
+`.env` に `GOOGLE_MAPS_API_KEY` が設定されている必要があります。API 呼び出し前に `scripts/inject_maps_keys.dart` の実行も推奨です。
+
 ## 備考
 
 - 初期段階では UI よりもコアロジック（スコア/ランキング）を先に仕上げると安全です。
