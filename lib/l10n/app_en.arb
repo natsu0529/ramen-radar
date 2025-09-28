@@ -1,0 +1,20 @@
+{
+  "appTitle": "Ramen Radar",
+  "genreAll": "ALL",
+  "genreIekei": "Iekei",
+  "genreJiro": "Jiro",
+  "list": "List",
+  "map": "Map",
+  "spotGradeLabel": "Spot grade",
+  "distanceKm": "{distance} km",
+  "rating": "Rating {rating}",
+  "score": "{score}",
+  "errorRankingFetch": "Failed to fetch ranking",
+  "retry": "Retry",
+  "openSettings": "Open Settings",
+  "errorLocationServiceDisabled": "Location service is disabled. Please enable it in system settings.",
+  "errorPermissionDenied": "Location permission denied. Please allow it.",
+  "errorPermissionDeniedForever": "Location permission permanently denied. Please allow it in Settings.",
+  "errorTimeout": "Getting current location timed out. Please retry.",
+  "errorLocationGeneric": "Failed to get current location"
+}

@@ -1,7 +1,6 @@
 # Dart & Flutter
 .dart_tool/
 .packages
-pubspec.lock
 
 # Flutter build outputs
 build/
@@ -34,4 +33,3 @@ web/.dart_tool/
 
 # Env
 .env
-

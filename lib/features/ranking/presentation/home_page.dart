@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../models.dart';
 import '../../../scoring.dart';
@@ -7,6 +9,8 @@ import '../../../shared/di/providers.dart';
 import '../../../shared/utils/location_service.dart';
 
 final genreProvider = StateProvider<Genre>((ref) => Genre.all);
+enum ViewMode { list, map }
+final viewModeProvider = StateProvider<ViewMode>((ref) => ViewMode.list);
 
 final currentLocationProvider = FutureProvider<LatLng>((ref) async {
   final svc = ref.watch(locationServiceProvider);
@@ -27,25 +31,32 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final genre = ref.watch(genreProvider);
+    final viewMode = ref.watch(viewModeProvider);
     final loc = ref.watch(currentLocationProvider);
     final ranking = ref.watch(rankingProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ramen Radar'),
+        title: Text(AppLocalizations.of(context)!.appTitle),
       ),
       body: Column(
         children: [
           const SizedBox(height: 8),
           _GenreChips(genre: genre, onChanged: (g) => ref.read(genreProvider.notifier).state = g),
           const Divider(height: 1),
+          _ViewToggle(
+            mode: viewMode,
+            onChanged: (m) => ref.read(viewModeProvider.notifier).state = m,
+          ),
           Expanded(
             child: loc.when(
-              data: (_) => ranking.when(
-                data: (list) => _RankingList(entries: list),
+              data: (pos) => ranking.when(
+                data: (list) => viewMode == ViewMode.list
+                    ? _RankingList(entries: list)
+                    : _MapView(current: pos, entries: list),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => _ErrorView(
-                  message: 'ランキングの取得に失敗しました\n$e',
+                  message: '${AppLocalizations.of(context)!.errorRankingFetch}\n$e',
                   onRetry: () {
                     ref.invalidate(rankingProvider);
                   },
@@ -76,17 +87,17 @@ class _GenreChips extends StatelessWidget {
       spacing: 8,
       children: [
         ChoiceChip(
-          label: const Text('ALL'),
+          label: Text(AppLocalizations.of(context)!.genreAll),
           selected: genre == Genre.all,
           onSelected: (_) => onChanged(Genre.all),
         ),
         ChoiceChip(
-          label: const Text('家系'),
+          label: Text(AppLocalizations.of(context)!.genreIekei),
           selected: genre == Genre.iekei,
           onSelected: (_) => onChanged(Genre.iekei),
         ),
         ChoiceChip(
-          label: const Text('二郎系'),
+          label: Text(AppLocalizations.of(context)!.genreJiro),
           selected: genre == Genre.jiro,
           onSelected: (_) => onChanged(Genre.jiro),
         ),
@@ -108,7 +119,7 @@ class _RankingList extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              const Text('スポット評価:'),
+              Text('${AppLocalizations.of(context)!.spotGradeLabel}:'),
               const SizedBox(width: 8),
               Chip(label: Text(avgGrade)),
             ],
@@ -124,7 +135,9 @@ class _RankingList extends StatelessWidget {
               return ListTile(
                 leading: CircleAvatar(child: Text('${index + 1}')),
                 title: Text(e.place.name),
-                subtitle: Text('評価 ${e.place.rating.toStringAsFixed(1)}・距離 ${_fmtDistance(e.roundedDistanceKm)} km'),
+                subtitle: Text(
+                  '${AppLocalizations.of(context)!.rating(e.place.rating.toStringAsFixed(1))}・${AppLocalizations.of(context)!.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
+                ),
                 trailing: Text(e.score.toStringAsFixed(2)),
               );
             },
@@ -132,6 +145,65 @@ class _RankingList extends StatelessWidget {
         ),
       ],
     );
+}
+
+class _ViewToggle extends StatelessWidget {
+  const _ViewToggle({required this.mode, required this.onChanged});
+  final ViewMode mode;
+  final ValueChanged<ViewMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ToggleButtons(
+        isSelected: [mode == ViewMode.list, mode == ViewMode.map],
+        onPressed: (index) => onChanged(index == 0 ? ViewMode.list : ViewMode.map),
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        children: [
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text(AppLocalizations.of(context)!.list)),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text(AppLocalizations.of(context)!.map)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapView extends StatelessWidget {
+  const _MapView({required this.current, required this.entries});
+  final LatLng current;
+  final List<RankingEntry> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final markers = entries.map((e) {
+      return gmap.Marker(
+        markerId: gmap.MarkerId(e.place.id),
+        position: gmap.LatLng(e.place.location.lat, e.place.location.lng),
+        infoWindow: gmap.InfoWindow(
+          title: e.place.name,
+          snippet: '★${e.place.rating.toStringAsFixed(1)}  距離 ${_fmtDistance(e.roundedDistanceKm)}km  点 ${e.score.toStringAsFixed(2)}',
+        ),
+      );
+    }).toSet();
+
+    return gmap.GoogleMap(
+      initialCameraPosition: gmap.CameraPosition(
+        target: gmap.LatLng(current.lat, current.lng),
+        zoom: 14,
+      ),
+      markers: markers,
+      myLocationButtonEnabled: false,
+      myLocationEnabled: false,
+      compassEnabled: true,
+      mapToolbarEnabled: false,
+    );
+  }
+
+  String _fmtDistance(double km) {
+    if (km < 1.0) return km.toStringAsFixed(2);
+    return km.toStringAsFixed(2);
+  }
 }
 
 class _ErrorView extends StatelessWidget {
@@ -149,7 +221,7 @@ class _ErrorView extends StatelessWidget {
           children: [
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: const Text('再試行')),
+            ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context)!.retry)),
           ],
         ),
       ),
@@ -165,21 +237,21 @@ class _LocationErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String message = '現在地の取得に失敗しました';
+    String message = AppLocalizations.of(context)!.errorLocationGeneric;
     if (error is LocationException) {
       final e = error as LocationException;
       switch (e.code) {
         case 'service_disabled':
-          message = '位置情報サービスが無効です。端末の設定を確認してください。';
+          message = AppLocalizations.of(context)!.errorLocationServiceDisabled;
           break;
         case 'permission_denied':
-          message = '位置情報の権限が拒否されました。許可してください。';
+          message = AppLocalizations.of(context)!.errorPermissionDenied;
           break;
         case 'permission_denied_forever':
-          message = '位置情報の権限が恒久的に拒否されています。設定から許可してください。';
+          message = AppLocalizations.of(context)!.errorPermissionDeniedForever;
           break;
         case 'timeout':
-          message = '現在地の取得がタイムアウトしました。再試行してください。';
+          message = AppLocalizations.of(context)!.errorTimeout;
           break;
         default:
           message = e.message;
@@ -197,23 +269,14 @@ class _LocationErrorView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(onPressed: onRetry, child: const Text('再試行')),
+                ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context)!.retry)),
                 const SizedBox(width: 12),
-                OutlinedButton(onPressed: onOpenSettings, child: const Text('設定を開く')),
+                OutlinedButton(onPressed: onOpenSettings, child: Text(AppLocalizations.of(context)!.openSettings)),
               ],
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-  String _fmtDistance(double km) {
-    if (km < 1.0) {
-      return km.toStringAsFixed(2);
-    }
-    // Keep as is, already rounded by logic; format to 2 decimals for display consistency
-    return km.toStringAsFixed(2);
   }
 }

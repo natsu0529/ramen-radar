@@ -49,6 +49,13 @@ GOOGLE_MAPS_API_KEY="あなたのAPIキー"
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
+### ローカライズ生成（gen_l10n）
+
+```bash
+fvm flutter gen-l10n
+```
+もしくは `flutter run` 時に自動生成されます。
+
 ## 実行（目安）
 
 ```bash
@@ -56,8 +63,33 @@ flutter pub get
 flutter run
 ```
 
+## プラットフォーム生成と Google Maps API キー反映
+
+最初にプラットフォームを生成します（Android/iOS/Web）。
+
+```bash
+fvm flutter create . --platforms=android,ios,web
+```
+
+API キーは `.env` の `GOOGLE_MAPS_API_KEY` を使用します。以下のスクリプトで各プラットフォームに反映できます。
+
+```bash
+fvm dart run scripts/inject_maps_keys.dart
+```
+
+補足:
+- Android: `android/app/build.gradle` に `manifestPlaceholders`、`AndroidManifest.xml` に `<meta-data>` が挿入されます。
+- iOS: `ios/Runner/Info.plist` に `GMSApiKey` と `NSLocationWhenInUseUsageDescription` が挿入されます。
+- Web: `web/index.html` に Google Maps JS API の `<script>` タグが追加されます。
+
+その後、デバイスを指定して起動します。
+
+```bash
+fvm flutter devices
+fvm flutter run -d <device-id>
+```
+
 ## 備考
 
 - 初期段階では UI よりもコアロジック（スコア/ランキング）を先に仕上げると安全です。
 - Distance Matrix のレート制限に注意し、距離問い合わせはバッチ化/キャッシュを推奨。
-

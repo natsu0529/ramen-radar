@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
+  flutter_localizations:
+    sdk: flutter
 
   # State management / DI
   flutter_riverpod: ^2.5.1
@@ -46,3 +48,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
