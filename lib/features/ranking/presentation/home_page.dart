@@ -8,7 +8,6 @@ import '../../../shared/di/providers.dart';
 import '../../../shared/theme/score_colors.dart';
 import '../../../shared/utils/location_service.dart';
 import '../../../shared/utils/network_status.dart';
-import 'map_widget.dart';
 import 'place_detail_sheet.dart';
 import 'last_ranking_provider.dart';
 

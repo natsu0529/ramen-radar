@@ -6,6 +6,7 @@ import 'package:ramen_radar/app.dart';
 import 'package:ramen_radar/features/ranking/presentation/home_page.dart';
 import 'package:ramen_radar/models.dart';
 import 'package:ramen_radar/shared/di/providers.dart';
+import 'package:ramen_radar/features/ranking/domain/ranking_repository.dart';
 import 'package:ramen_radar/shared/utils/location_service.dart';
 
 void main() {
@@ -65,4 +66,3 @@ class _ErrorRepo implements RankingRepository {
     return Future.error(Exception('failed'));
   }
 }
-

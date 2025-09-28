@@ -1,4 +1,4 @@
-import 'package/flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/ranking/data/mock_ranking_repository.dart';
 import '../../features/ranking/data/google_ranking_repository.dart';
