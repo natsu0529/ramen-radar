@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_radar/l10n/app_localizations.dart';
 
@@ -22,22 +23,21 @@ final currentLocationProvider = FutureProvider<LatLng>((ref) async {
 
 final rankingProvider = FutureProvider<List<RankingEntry>>((ref) async {
   try {
-    print('=== DEBUG: rankingProvider START ===');
+    developer.log('=== DEBUG: rankingProvider START ===');
     final repo = ref.watch(rankingRepositoryProvider);
-    print('DEBUG: rankingRepositoryProvider type: ${repo.runtimeType}');
+    developer.log('DEBUG: rankingRepositoryProvider type: ${repo.runtimeType}');
     final genre = ref.watch(genreProvider);
-    print('DEBUG: genre: $genre');
+    developer.log('DEBUG: genre: $genre');
     final current = await ref.watch(currentLocationProvider.future);
-    print('DEBUG: current location from provider: $current');
-    print('DEBUG: About to call repo.fetchCandidates...');
+    developer.log('DEBUG: current location from provider: $current');
+    developer.log('DEBUG: About to call repo.fetchCandidates...');
     final candidates = await repo.fetchCandidates(genre: genre, current: current);
-    print('DEBUG: candidates received: ${candidates.length} items');
+    developer.log('DEBUG: candidates received: ${candidates.length} items');
     final ranking = computeRanking(candidates);
-    print('DEBUG: ranking computed: ${ranking.length} items');
+    developer.log('DEBUG: ranking computed: ${ranking.length} items');
     return ranking;
   } catch (e, stackTrace) {
-    print('ERROR in rankingProvider: $e');
-    print('ERROR stackTrace: $stackTrace');
+    developer.log('ERROR in rankingProvider: $e', error: e, stackTrace: stackTrace);
     rethrow;
   }
 });

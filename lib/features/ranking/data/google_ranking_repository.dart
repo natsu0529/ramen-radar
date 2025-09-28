@@ -21,10 +21,10 @@ class GoogleRankingRepository implements RankingRepository {
 
   @override
   Future<List<Candidate>> fetchCandidates({required Genre genre, required LatLng current}) async {
-    print('=== DEBUG: GoogleRankingRepository.fetchCandidates START ===');
-    print('DEBUG: Genre: $genre');
-    print('DEBUG: Current location: $current');
-    print('DEBUG: Environment variables loaded: ${dotenv.env.keys.toList()}');
+    developer.log('=== DEBUG: GoogleRankingRepository.fetchCandidates START ===');
+    developer.log('DEBUG: Genre: $genre');
+    developer.log('DEBUG: Current location: $current');
+    developer.log('DEBUG: Environment variables loaded: ${dotenv.env.keys.toList()}');
     developer.log('GoogleRankingRepository: API key length=${_apiKey.length}, isEmpty=${_apiKey.isEmpty}');
     
     if (_apiKey.isEmpty) {
@@ -36,19 +36,18 @@ class GoogleRankingRepository implements RankingRepository {
     final distApi = GoogleDistanceMatrixApi(_dio, apiKey: _apiKey);
     final originBucket = _bucketLatLng(current);
     final placesKey = 'nearby:${genre.name}:$originBucket:2000';
-    print('DEBUG: Places cache key: $placesKey');
+    developer.log('DEBUG: Places cache key: $placesKey');
     var places = _placesCache.get(placesKey);
     if (places != null) {
-      print('DEBUG: Using cached places: ${places.length} items');
+      developer.log('DEBUG: Using cached places: ${places.length} items');
     } else {
-      print('DEBUG: Calling Places API...');
+      developer.log('DEBUG: Calling Places API...');
       try {
         places = await placesApi.searchNearbyRamen(current: current, genre: genre);
-        print('DEBUG: Places API returned: ${places.length} items');
+        developer.log('DEBUG: Places API returned: ${places.length} items');
         _placesCache.set(placesKey, places, ttl: const Duration(minutes: 3));
       } catch (e, stackTrace) {
-        print('ERROR: Places API failed: $e');
-        print('ERROR: Stack trace: $stackTrace');
+        developer.log('ERROR: Places API failed: $e', error: e, stackTrace: stackTrace);
         return const [];
       }
     }
@@ -74,40 +73,39 @@ class GoogleRankingRepository implements RankingRepository {
     }
 
     if (missingDest.isNotEmpty) {
-      print('DEBUG: Calling Distance Matrix API for ${missingDest.length} destinations...');
+      developer.log('DEBUG: Calling Distance Matrix API for ${missingDest.length} destinations...');
       try {
         final fetched = await distApi.distancesKm(origin: current, destinations: missingDest, mode: 'walking');
-        print('DEBUG: Distance Matrix API returned: ${fetched.length} distances');
+        developer.log('DEBUG: Distance Matrix API returned: ${fetched.length} distances');
         for (var j = 0; j < missingIdx.length && j < fetched.length; j++) {
           final i = missingIdx[j];
           final d = fetched[j];
-          print('DEBUG: Distance for place ${top[i].name}: ${d}km');
+          developer.log('DEBUG: Distance for place ${top[i].name}: ${d}km');
           distancesKm[i] = d;
           final pid = top[i].id;
           _distanceCache.set('dist:$originBucket:$pid', d, ttl: const Duration(minutes: 3));
         }
       } catch (e, stackTrace) {
-        print('ERROR: Distance Matrix API failed: $e');
-        print('ERROR: Stack trace: $stackTrace');
+        developer.log('ERROR: Distance Matrix API failed: $e', error: e, stackTrace: stackTrace);
         // Continue with Haversine fallback
       }
     } else {
-      print('DEBUG: All distances found in cache');
+      developer.log('DEBUG: All distances found in cache');
     }
 
-    print('DEBUG: Building final candidate list...');
+    developer.log('DEBUG: Building final candidate list...');
     for (var i = 0; i < top.length; i++) {
       var d = distancesKm[i];
       if (d.isNaN || d.isInfinite) {
         // Fallback to Haversine distance if API failed
         d = _haversineKm(current, top[i].location);
-        print('DEBUG: Using Haversine fallback for ${top[i].name}: ${d}km');
+        developer.log('DEBUG: Using Haversine fallback for ${top[i].name}: ${d}km');
       }
       result.add(Candidate(place: top[i], distanceKm: d));
     }
-    print('DEBUG: Final candidates: ${result.length} items');
+    developer.log('DEBUG: Final candidates: ${result.length} items');
     for (var candidate in result.take(5)) {
-      print('DEBUG: ${candidate.place.name} - ${candidate.distanceKm.toStringAsFixed(2)}km - Rating: ${candidate.place.rating}');
+      developer.log('DEBUG: ${candidate.place.name} - ${candidate.distanceKm.toStringAsFixed(2)}km - Rating: ${candidate.place.rating}');
     }
     return result;
   }

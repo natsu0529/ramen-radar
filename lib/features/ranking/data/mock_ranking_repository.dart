@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:developer' as developer;
 
 import 'package:ramen_radar/models.dart';
 import 'package:ramen_radar/features/ranking/domain/ranking_repository.dart';
@@ -9,9 +10,9 @@ class MockRankingRepository implements RankingRepository {
     required Genre genre,
     required LatLng current,
   }) async {
-    print('=== DEBUG: MockRankingRepository.fetchCandidates START ===');
-    print('DEBUG: Genre: $genre');
-    print('DEBUG: Current location: $current');
+    developer.log('=== DEBUG: MockRankingRepository.fetchCandidates START ===');
+    developer.log('DEBUG: Genre: $genre');
+    developer.log('DEBUG: Current location: $current');
     // Static mock data for initial UI wiring
     // Distances are raw; will be rounded by scoring logic
     final base = <Place>[

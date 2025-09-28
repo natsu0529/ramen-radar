@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:developer' as developer;
 
 import 'package:ramen_radar/features/ranking/data/google_ranking_repository.dart';
 import 'package:ramen_radar/features/ranking/data/mock_ranking_repository.dart';
@@ -12,12 +13,12 @@ import 'package:ramen_radar/features/ranking/presentation/map_widget.dart';
 final rankingRepositoryProvider = Provider<RankingRepository>((ref) {
   // Check runtime environment variable from dotenv or system environment
   final useGoogleFromEnv = dotenv.env['USE_GOOGLE_API']?.toLowerCase() == 'true';
-  final useGoogleFromSystem = const bool.fromEnvironment('USE_GOOGLE_API');
+  const useGoogleFromSystem = bool.fromEnvironment('USE_GOOGLE_API');
   final useGoogle = useGoogleFromEnv || useGoogleFromSystem;
   
-  print('DEBUG: USE_GOOGLE_API from dotenv: ${dotenv.env['USE_GOOGLE_API']}');
-  print('DEBUG: USE_GOOGLE_API from system: $useGoogleFromSystem');
-  print('DEBUG: Using Google API: $useGoogle');
+  developer.log('DEBUG: USE_GOOGLE_API from dotenv: ${dotenv.env['USE_GOOGLE_API']}');
+  developer.log('DEBUG: USE_GOOGLE_API from system: $useGoogleFromSystem');
+  developer.log('DEBUG: Using Google API: $useGoogle');
   
   if (useGoogle) {
     return GoogleRankingRepository();
