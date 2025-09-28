@@ -259,13 +259,12 @@ class _RankingList extends StatelessWidget {
 // Map rendering is provided via Provider to allow test overrides.
 
 class _ListSkeleton extends StatelessWidget {
-  const _ListSkeleton({this.items = 6});
-  final int items;
+  const _ListSkeleton();
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      itemCount: items,
+      itemCount: 6,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (context, index) {
         return Padding(
@@ -319,7 +318,7 @@ String _tagLabel(RamenTag t) {
 String _fmtDistance(double km) => km.toStringAsFixed(1);
 
 Future<void> _openInMaps(LatLng loc, {String? placeId}) async {
-  final base = 'https://www.google.com/maps/search/?api=1';
+  const base = 'https://www.google.com/maps/search/?api=1';
   final query = 'query=${Uri.encodeComponent('${loc.lat},${loc.lng}')}';
   final pid = (placeId != null && placeId.isNotEmpty) ? '&query_place_id=${Uri.encodeComponent(placeId)}' : '';
   final uri = Uri.parse('$base&$query$pid');
