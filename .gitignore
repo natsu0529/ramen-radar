@@ -33,3 +33,6 @@ web/.dart_tool/
 
 # Env
 .env
+
+# FVM (Flutter Version Manager)
+.fvm/flutter_sdk/
