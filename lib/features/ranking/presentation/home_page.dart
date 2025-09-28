@@ -21,11 +21,25 @@ final currentLocationProvider = FutureProvider<LatLng>((ref) async {
 });
 
 final rankingProvider = FutureProvider<List<RankingEntry>>((ref) async {
-  final repo = ref.watch(rankingRepositoryProvider);
-  final genre = ref.watch(genreProvider);
-  final current = await ref.watch(currentLocationProvider.future);
-  final candidates = await repo.fetchCandidates(genre: genre, current: current);
-  return computeRanking(candidates);
+  try {
+    print('=== DEBUG: rankingProvider START ===');
+    final repo = ref.watch(rankingRepositoryProvider);
+    print('DEBUG: rankingRepositoryProvider type: ${repo.runtimeType}');
+    final genre = ref.watch(genreProvider);
+    print('DEBUG: genre: $genre');
+    final current = await ref.watch(currentLocationProvider.future);
+    print('DEBUG: current location from provider: $current');
+    print('DEBUG: About to call repo.fetchCandidates...');
+    final candidates = await repo.fetchCandidates(genre: genre, current: current);
+    print('DEBUG: candidates received: ${candidates.length} items');
+    final ranking = computeRanking(candidates);
+    print('DEBUG: ranking computed: ${ranking.length} items');
+    return ranking;
+  } catch (e, stackTrace) {
+    print('ERROR in rankingProvider: $e');
+    print('ERROR stackTrace: $stackTrace');
+    rethrow;
+  }
 });
 
 class HomePage extends ConsumerWidget {

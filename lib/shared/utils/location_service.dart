@@ -16,27 +16,40 @@ class LocationService {
   /// Ensure services and permissions, then fetch current position.
   /// Throws [LocationException] when unavailable.
   Future<LatLng> getCurrentLatLng({LocationAccuracy accuracy = LocationAccuracy.high, Duration timeout = const Duration(seconds: 8)}) async {
+    print('=== DEBUG: LocationService.getCurrentLatLng START ===');
+    
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    print('DEBUG: Location service enabled: $serviceEnabled');
     if (!serviceEnabled) {
+      print('DEBUG: Location service disabled, throwing exception');
       throw LocationException('service_disabled', '位置情報サービスが無効です');
     }
 
     var permission = await Geolocator.checkPermission();
+    print('DEBUG: Initial permission status: $permission');
     if (permission == LocationPermission.denied) {
+      print('DEBUG: Requesting location permission');
       permission = await Geolocator.requestPermission();
+      print('DEBUG: Permission after request: $permission');
     }
 
     if (permission == LocationPermission.denied) {
+      print('DEBUG: Permission denied, throwing exception');
       throw LocationException('permission_denied', '位置情報の権限が拒否されました');
     }
     if (permission == LocationPermission.deniedForever) {
+      print('DEBUG: Permission denied forever, throwing exception');
       throw LocationException('permission_denied_forever', '位置情報の権限が恒久的に拒否されています');
     }
 
+    print('DEBUG: Getting current position with accuracy: $accuracy, timeout: $timeout');
     final pos = await Geolocator.getCurrentPosition(desiredAccuracy: accuracy).timeout(timeout, onTimeout: () {
+      print('DEBUG: Location timeout occurred');
       throw LocationException('timeout', '現在地の取得がタイムアウトしました');
     });
-    return LatLng(pos.latitude, pos.longitude);
+    final result = LatLng(pos.latitude, pos.longitude);
+    print('DEBUG: Location obtained successfully: $result');
+    return result;
   }
 
   /// Open system settings for the app.

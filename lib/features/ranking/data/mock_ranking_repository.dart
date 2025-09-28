@@ -9,6 +9,9 @@ class MockRankingRepository implements RankingRepository {
     required Genre genre,
     required LatLng current,
   }) async {
+    print('=== DEBUG: MockRankingRepository.fetchCandidates START ===');
+    print('DEBUG: Genre: $genre');
+    print('DEBUG: Current location: $current');
     // Static mock data for initial UI wiring
     // Distances are raw; will be rounded by scoring logic
     final base = <Place>[
