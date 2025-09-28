@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'models.dart';
+import 'package:ramen_radar/models.dart';
 
 /// Round distance according to the spec:
 /// - If < 1km, keep as-is (no rounding)
@@ -59,4 +59,3 @@ String computeSpotGrade(List<RankingEntry> entries) {
   final avg = top.map((e) => e.score).fold<double>(0, (a, b) => a + b) / top.length;
   return spotGradeFromAverage(avg);
 }
-

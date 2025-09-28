@@ -67,7 +67,7 @@ Future<void> _patchAndroid(String key) async {
   if (!manifestText.contains('com.google.android.geo.API_KEY')) {
     manifestText = manifestText.replaceFirst(
       '</application>',
-      '    <meta-data android:name="com.google.android.geo.API_KEY" android:value="' + placeholder + '" />\n  </application>',
+      '    <meta-data android:name="com.google.android.geo.API_KEY" android:value="$placeholder" />\n  </application>',
     );
   }
   manifestText = manifestText.replaceAll(placeholder, key);
@@ -137,4 +137,3 @@ String _htmlEscape(String v) => v
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
-

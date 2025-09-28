@@ -1,7 +1,7 @@
-import 'dart:math' as MathCore;
+import 'dart:math' as math;
 
-import '../../../models.dart';
-import '../domain/ranking_repository.dart';
+import 'package:ramen_radar/models.dart';
+import 'package:ramen_radar/features/ranking/domain/ranking_repository.dart';
 
 class MockRankingRepository implements RankingRepository {
   @override
@@ -54,9 +54,8 @@ double _deg2rad(double deg) => deg * (3.141592653589793 / 180.0);
 
 // Minimal math helpers to avoid importing dart:math alias conflicts above
 class Maths {
-  static double sin(double x) => MathCore.sin(x);
-  static double cos(double x) => MathCore.cos(x);
-  static double atan2(double y, double x) => MathCore.atan2(y, x);
-  static double sqrt(num x) => MathCore.sqrt(x);
+  static double sin(double x) => math.sin(x);
+  static double cos(double x) => math.cos(x);
+  static double atan2(double y, double x) => math.atan2(y, x);
+  static double sqrt(num x) => math.sqrt(x);
 }
-

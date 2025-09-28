@@ -1,12 +1,12 @@
-import 'dart:math' as MathCore;
+import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import '../../../models.dart';
+import 'package:ramen_radar/models.dart';
 import 'package:ramen_radar/shared/utils/ttl_cache.dart';
-import '../domain/ranking_repository.dart';
-import 'google_apis.dart';
+import 'package:ramen_radar/features/ranking/domain/ranking_repository.dart';
+import 'package:ramen_radar/features/ranking/data/google_apis.dart';
 
 class GoogleRankingRepository implements RankingRepository {
   GoogleRankingRepository({Dio? dio, String? apiKey})
@@ -98,8 +98,8 @@ class GoogleRankingRepository implements RankingRepository {
 
 // Minimal math helpers
 class Maths {
-  static double sin(double x) => MathCore.sin(x);
-  static double cos(double x) => MathCore.cos(x);
-  static double atan2(double y, double x) => MathCore.atan2(y, x);
-  static double sqrt(num x) => MathCore.sqrt(x);
+  static double sin(double x) => math.sin(x);
+  static double cos(double x) => math.cos(x);
+  static double atan2(double y, double x) => math.atan2(y, x);
+  static double sqrt(num x) => math.sqrt(x);
 }

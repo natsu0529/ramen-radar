@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ramen_radar/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../models.dart';
+import 'package:ramen_radar/models.dart';
 
 class PlaceDetailSheet extends StatelessWidget {
   const PlaceDetailSheet({super.key, required this.entry});
@@ -10,7 +10,7 @@ class PlaceDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),

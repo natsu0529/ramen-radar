@@ -1,4 +1,4 @@
-/// Core domain models for Ramen Radar (framework-agnostic).
+// Core domain models for Ramen Radar (framework-agnostic).
 
 enum Genre {
   all,
@@ -55,4 +55,3 @@ class RankingEntry {
     required this.roundedDistanceKm,
   });
 }
-

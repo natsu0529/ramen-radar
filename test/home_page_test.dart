@@ -7,7 +7,6 @@ import 'package:ramen_radar/features/ranking/domain/ranking_repository.dart';
 import 'package:ramen_radar/models.dart';
 import 'package:ramen_radar/shared/di/providers.dart';
 import 'package:ramen_radar/features/ranking/presentation/home_page.dart';
-import 'package:ramen_radar/features/ranking/presentation/map_widget.dart';
 
 class _TestRankingRepo implements RankingRepository {
   @override

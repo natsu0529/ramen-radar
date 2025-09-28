@@ -1,7 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 
-import '../../models.dart';
+import 'package:ramen_radar/models.dart';
 
 class LocationException implements Exception {
   final String code;

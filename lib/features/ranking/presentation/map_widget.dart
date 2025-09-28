@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ramen_radar/l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 
-import '../../../models.dart';
+import 'package:ramen_radar/models.dart';
 
 typedef MapWidgetBuilder = Widget Function({
   required LatLng current,
@@ -29,7 +29,7 @@ Widget defaultMapWidgetBuilder({
 
   return Builder(builder: (context) {
     return Semantics(
-      label: AppLocalizations.of(context)!.mapViewA11y(entries.length.toString()),
+      label: AppLocalizations.of(context).mapViewA11y(entries.length.toString()),
       child: gmap.GoogleMap(
         initialCameraPosition: gmap.CameraPosition(
           target: gmap.LatLng(current.lat, current.lng),

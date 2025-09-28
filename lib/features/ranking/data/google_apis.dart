@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
-import '../../../models.dart';
-import 'dto/places_dto.dart';
-import 'dto/distance_matrix_dto.dart';
+import 'package:ramen_radar/models.dart';
+import 'package:ramen_radar/features/ranking/data/dto/places_dto.dart';
+import 'package:ramen_radar/features/ranking/data/dto/distance_matrix_dto.dart';
 
 class GooglePlacesApi {
   GooglePlacesApi(this._dio, {required this.apiKey});

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ramen_radar/l10n/app_localizations.dart';
 
-import '../../../models.dart';
-import '../../../scoring.dart';
-import '../../../shared/di/providers.dart';
-import '../../../shared/theme/score_colors.dart';
-import '../../../shared/utils/location_service.dart';
-import '../../../shared/utils/network_status.dart';
-import 'place_detail_sheet.dart';
-import 'last_ranking_provider.dart';
+import 'package:ramen_radar/models.dart';
+import 'package:ramen_radar/scoring.dart';
+import 'package:ramen_radar/shared/di/providers.dart';
+import 'package:ramen_radar/shared/theme/score_colors.dart';
+import 'package:ramen_radar/shared/utils/location_service.dart';
+import 'package:ramen_radar/shared/utils/network_status.dart';
+import 'package:ramen_radar/features/ranking/presentation/last_ranking_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final genreProvider = StateProvider<Genre>((ref) => Genre.all);
-enum ViewMode { list, map }
-final viewModeProvider = StateProvider<ViewMode>((ref) => ViewMode.list);
+
+enum _LangChoice { en, ja }
 
 final currentLocationProvider = FutureProvider<LatLng>((ref) async {
   final svc = ref.watch(locationServiceProvider);
@@ -34,7 +34,6 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final genre = ref.watch(genreProvider);
-    final viewMode = ref.watch(viewModeProvider);
     final loc = ref.watch(currentLocationProvider);
     final ranking = ref.watch(rankingProvider);
     // Cache the last successful ranking result via a listener to avoid modifying providers during build.
@@ -49,8 +48,38 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.appTitle),
+        title: Text(AppLocalizations.of(context).appTitle),
         actions: [
+          // Language switcher
+          Consumer(builder: (context, ref, _) {
+            final current = ref.watch(localeProvider);
+            return PopupMenuButton<_LangChoice>(
+              tooltip: 'Language',
+              icon: const Icon(Icons.language),
+              onSelected: (choice) {
+                switch (choice) {
+                  case _LangChoice.en:
+                    ref.read(localeProvider.notifier).state = const Locale('en');
+                    break;
+                  case _LangChoice.ja:
+                    ref.read(localeProvider.notifier).state = const Locale('ja');
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                CheckedPopupMenuItem(
+                  value: _LangChoice.en,
+                  checked: current?.languageCode == 'en',
+                  child: const Text('EN'),
+                ),
+                CheckedPopupMenuItem(
+                  value: _LangChoice.ja,
+                  checked: current?.languageCode == 'ja',
+                  child: const Text('日本語'),
+                ),
+              ],
+            );
+          }),
           IconButton(
             tooltip: MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
             onPressed: () => ref.invalidate(rankingProvider),
@@ -63,48 +92,31 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: 8),
           _GenreChips(genre: genre, onChanged: (g) => ref.read(genreProvider.notifier).state = g),
           const Divider(height: 1),
-          _ViewToggle(
-            mode: viewMode,
-            onChanged: (m) => ref.read(viewModeProvider.notifier).state = m,
-          ),
           if (offline)
             Container(
               width: double.infinity,
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text('${AppLocalizations.of(context)!.offline} ・ ${AppLocalizations.of(context)!.showingLastResults}'),
+              child: Text('${AppLocalizations.of(context).offline} ・ ${AppLocalizations.of(context).showingLastResults}'),
             ),
           Expanded(
             child: loc.when(
               data: (pos) => ranking.when(
                 data: (list) {
-                  return viewMode == ViewMode.list
-                    ? _RankingList(entries: list, onSelect: (e) => showPlaceDetailSheet(context, e))
-                    : ref.watch(mapWidgetBuilderProvider)(
-                        current: pos,
-                        entries: list,
-                        onSelect: (e) => showPlaceDetailSheet(context, e),
-                      );
+                  return _RankingList(
+                    entries: list,
+                    onSelect: (e) => _openInMaps(e.place.location, placeId: e.place.id),
+                  );
                 },
-                loading: () => viewMode == ViewMode.list
-                    ? const _ListSkeleton()
-                    : const Center(child: CircularProgressIndicator()),
+                loading: () => const _ListSkeleton(),
                 error: (e, st) => offline && lastRanking != null
-                    ? (viewMode == ViewMode.list
-                        ? _RankingList(entries: lastRanking, onSelect: (e) => showPlaceDetailSheet(context, e))
-                        : ref.watch(mapWidgetBuilderProvider)(
-                            current: pos,
-                            entries: lastRanking,
-                            onSelect: (e) => showPlaceDetailSheet(context, e),
-                          ))
+                    ? _RankingList(entries: lastRanking, onSelect: (e) => _openInMaps(e.place.location, placeId: e.place.id))
                     : _ErrorView(
-                        message: '${AppLocalizations.of(context)!.errorRankingFetch}\n$e',
+                        message: '${AppLocalizations.of(context).errorRankingFetch}\n$e',
                         onRetry: () => ref.invalidate(rankingProvider),
                       ),
               ),
-              loading: () => viewMode == ViewMode.list
-                  ? const _ListSkeleton()
-                  : const Center(child: CircularProgressIndicator()),
+              loading: () => const _ListSkeleton(),
               error: (e, st) => _LocationErrorView(error: e, onRetry: () {
                 ref.invalidate(currentLocationProvider);
               }, onOpenSettings: () async {
@@ -134,17 +146,17 @@ class _GenreChips extends StatelessWidget {
       spacing: 8,
       children: [
         ChoiceChip(
-          label: Text(AppLocalizations.of(context)!.genreAll),
+          label: Text(AppLocalizations.of(context).genreAll),
           selected: genre == Genre.all,
           onSelected: (_) => onChanged(Genre.all),
         ),
         ChoiceChip(
-          label: Text(AppLocalizations.of(context)!.genreIekei),
+          label: Text(AppLocalizations.of(context).genreIekei),
           selected: genre == Genre.iekei,
           onSelected: (_) => onChanged(Genre.iekei),
         ),
         ChoiceChip(
-          label: Text(AppLocalizations.of(context)!.genreJiro),
+          label: Text(AppLocalizations.of(context).genreJiro),
           selected: genre == Genre.jiro,
           onSelected: (_) => onChanged(Genre.jiro),
         ),
@@ -167,7 +179,7 @@ class _RankingList extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              Text('${AppLocalizations.of(context)!.spotGradeLabel}:'),
+              Text('${AppLocalizations.of(context).spotGradeLabel}:'),
               const SizedBox(width: 8),
               Chip(label: Text(avgGrade)),
             ],
@@ -184,15 +196,28 @@ class _RankingList extends StatelessWidget {
               itemBuilder: (context, index) {
                 final e = entries[index];
                 final color = Theme.of(context).colorScheme;
-                final t = AppLocalizations.of(context)!;
-                final chipBg = scoreColor(color, e.score).withOpacity(0.15);
+                final t = AppLocalizations.of(context);
+                final chipBg = scoreColor(color, e.score).withValues(alpha: 0.15);
                 final chipFg = scoreColor(color, e.score);
                 return Semantics(
                   label: '${e.place.name}, ${t.rating(e.place.rating.toStringAsFixed(1))}, ${t.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
                   button: true,
                   child: ListTile(
-                    leading: CircleAvatar(backgroundColor: color.primaryContainer, child: Text('${index + 1}')),
-                    title: Text(e.place.name),
+                    leading: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: color.primaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text('#${index + 1}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    title: InkWell(
+                      onTap: () => onSelect(e),
+                      child: Text(
+                        e.place.name,
+                        style: const TextStyle(decoration: TextDecoration.underline),
+                      ),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -207,9 +232,16 @@ class _RankingList extends StatelessWidget {
                           ),
                       ],
                     ),
-                    trailing: Chip(
-                      backgroundColor: chipBg,
-                      label: Text(e.score.toStringAsFixed(2), style: TextStyle(color: chipFg, fontWeight: FontWeight.bold)),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: chipBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).score(e.score.toStringAsFixed(2)),
+                        style: TextStyle(color: chipFg, fontWeight: FontWeight.bold),
+                      ),
                     ),
                     onTap: () => onSelect(e),
                   ),
@@ -224,28 +256,7 @@ class _RankingList extends StatelessWidget {
 
 }
 
-class _ViewToggle extends StatelessWidget {
-  const _ViewToggle({required this.mode, required this.onChanged});
-  final ViewMode mode;
-  final ValueChanged<ViewMode> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: SegmentedButton<ViewMode>(
-        style: const ButtonStyle(visualDensity: VisualDensity.compact),
-        segments: [
-          ButtonSegment<ViewMode>(value: ViewMode.list, label: Text(t.list), icon: const Icon(Icons.list)),
-          ButtonSegment<ViewMode>(value: ViewMode.map, label: Text(t.map), icon: const Icon(Icons.map_outlined)),
-        ],
-        selected: {mode},
-        onSelectionChanged: (s) => onChanged(s.first),
-      ),
-    );
-  }
-}
+// Map rendering is provided via Provider to allow test overrides.
 
 class _ListSkeleton extends StatelessWidget {
   const _ListSkeleton({this.items = 6});
@@ -307,6 +318,18 @@ String _tagLabel(RamenTag t) {
 
 String _fmtDistance(double km) => km.toStringAsFixed(1);
 
+Future<void> _openInMaps(LatLng loc, {String? placeId}) async {
+  final base = 'https://www.google.com/maps/search/?api=1';
+  final query = 'query=${Uri.encodeComponent('${loc.lat},${loc.lng}')}';
+  final pid = (placeId != null && placeId.isNotEmpty) ? '&query_place_id=${Uri.encodeComponent(placeId)}' : '';
+  final uri = Uri.parse('$base&$query$pid');
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+// View toggle removed
+
 class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
   final String message;
@@ -322,7 +345,7 @@ class _ErrorView extends StatelessWidget {
           children: [
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context)!.retry)),
+            ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).retry)),
           ],
         ),
       ),
@@ -338,21 +361,21 @@ class _LocationErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String message = AppLocalizations.of(context)!.errorLocationGeneric;
+    String message = AppLocalizations.of(context).errorLocationGeneric;
     if (error is LocationException) {
       final e = error as LocationException;
       switch (e.code) {
         case 'service_disabled':
-          message = AppLocalizations.of(context)!.errorLocationServiceDisabled;
+          message = AppLocalizations.of(context).errorLocationServiceDisabled;
           break;
         case 'permission_denied':
-          message = AppLocalizations.of(context)!.errorPermissionDenied;
+          message = AppLocalizations.of(context).errorPermissionDenied;
           break;
         case 'permission_denied_forever':
-          message = AppLocalizations.of(context)!.errorPermissionDeniedForever;
+          message = AppLocalizations.of(context).errorPermissionDeniedForever;
           break;
         case 'timeout':
-          message = AppLocalizations.of(context)!.errorTimeout;
+          message = AppLocalizations.of(context).errorTimeout;
           break;
         default:
           message = e.message;
@@ -370,9 +393,9 @@ class _LocationErrorView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context)!.retry)),
+                ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).retry)),
                 const SizedBox(width: 12),
-                OutlinedButton(onPressed: onOpenSettings, child: Text(AppLocalizations.of(context)!.openSettings)),
+                OutlinedButton(onPressed: onOpenSettings, child: Text(AppLocalizations.of(context).openSettings)),
               ],
             ),
           ],

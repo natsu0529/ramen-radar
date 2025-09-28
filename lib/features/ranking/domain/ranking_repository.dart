@@ -1,4 +1,4 @@
-import '../../../models.dart';
+import 'package:ramen_radar/models.dart';
 
 abstract class RankingRepository {
   Future<List<Candidate>> fetchCandidates({
@@ -6,4 +6,3 @@ abstract class RankingRepository {
     required LatLng current,
   });
 }
-
