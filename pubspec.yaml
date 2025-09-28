@@ -1,0 +1,48 @@
+name: ramen_radar
+description: Ramen Radar app per README plan.
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # State management / DI
+  flutter_riverpod: ^2.5.1
+  hooks_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Routing (planned)
+  auto_route: ^7.9.2
+
+  # Models / JSON
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Env
+  flutter_dotenv: ^5.1.0
+
+  # Location / Permissions / Map (planned)
+  geolocator: ^10.1.0
+  permission_handler: ^11.3.1
+  google_maps_flutter: ^2.6.1
+
+  # Networking
+  dio: ^5.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  auto_route_generator: ^7.9.2
+  riverpod_generator: ^2.4.0
+
+flutter:
+  uses-material-design: true

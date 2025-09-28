@@ -33,31 +33,31 @@
 - [ ] Flutter 環境確認（Flutter/Dart バージョン固定、`fvm` 必須）
 - [ ] 新規 Flutter アプリ雛形作成 or 既存プロジェクト整合確認
 - [ ] `flutter_lints` 導入とアナライザ設定（`analysis_options.yaml`）
-- [ ] `.env` 運用方針の決定（`flutter_dotenv`）
-- [ ] README に開発手順・API キー設定手順を追記
+- [x] `.env` 運用方針の決定（`flutter_dotenv`）と `.env.example` 追加
+- [x] 開発手順ドキュメント追加（`docs/DEVELOPMENT.md`）
 - [ ] GitHub Actions など CI（任意、後回し可）
 
 ---
 
 ## M1: アーキテクチャ基盤
 
-- [ ] ディレクトリ構成の作成（README 推奨構成に準拠）
-  - [ ] `lib/features/<feature>/{presentation,domain,data}`
-  - [ ] `lib/shared/{utils,theme,widget,di}`
-  - [ ] `lib/router`、`lib/gen`、`lib/app.dart`、`lib/main.dart`
-- [ ] 主要依存関係の導入
-  - [ ] 状態管理: `flutter_riverpod`, `hooks_riverpod`, `riverpod_annotation`
-  - [ ] ルーティング: `auto_route`
-  - [ ] モデル: `freezed`, `json_serializable`
-  - [ ] DI: Riverpod（必要なら `get_it` 併用）
-  - [ ] コード生成: `build_runner`
-  - [ ] 環境変数: `flutter_dotenv`
-  - [ ] 位置情報/権限: `geolocator`, `permission_handler`
-  - [ ] マップ表示: `google_maps_flutter`
-  - [ ] HTTP クライアント: `dio` or `http`（`dio` 推奨）
+- [x] ディレクトリ構成の作成（README 推奨構成に準拠）
+  - [x] `lib/features/<feature>/{presentation,domain,data}`（`ranking` を追加）
+  - [x] `lib/shared/{utils,theme,widget,di}`
+  - [x] `lib/router`、`lib/gen`、`lib/app.dart`、`lib/main.dart`
+ - [ ] 主要依存関係の導入
+  - [x] 状態管理: `flutter_riverpod`, `hooks_riverpod`, `riverpod_annotation`
+  - [x] ルーティング: `auto_route`（導入のみ）
+  - [x] モデル: `freezed`, `json_serializable`（導入のみ）
+  - [x] DI: Riverpod
+  - [x] コード生成: `build_runner`（導入のみ）
+  - [x] 環境変数: `flutter_dotenv`
+  - [x] 位置情報/権限: `geolocator`, `permission_handler`
+  - [x] マップ表示: `google_maps_flutter`（導入のみ）
+  - [x] HTTP クライアント: `dio`
 - [ ] `build_runner` 実行用スクリプト追加（`make`/`dart run`）
 - [ ] AutoRoute 設定: ルート定義 → 生成コード確認
-- [ ] Riverpod Generator 設定・サンプル Provider で疎通
+- [x] Riverpod Provider 雛形で疎通（モックリポジトリ）
 - [ ] Freezed/Json のビルド確認
 
 ---
@@ -81,9 +81,9 @@
 
 ## M3: データ取得・スコアリング・ランキングロジック
 
-- [ ] ドメイン設計
-  - [ ] Entity: `Place`, `Score`, `RankingEntry`, `GenreTag`
-  - [ ] ValueObject/Enum: `Genre`（ALL/IEKEI/JIRO）
+- [x] ドメイン設計（初期簡易実装）
+  - [x] Entity: `Place`, `RankingEntry`, `RamenTag`（`lib/models.dart`）
+  - [x] ValueObject/Enum: `Genre`（ALL/IEKEI/JIRO）
   - [ ] DTO と相互変換（Freezed/Json）
 - [ ] リポジトリ設計
   - [ ] `PlaceRepository`（検索/詳細取得）
@@ -92,26 +92,26 @@
 - [ ] データソース
   - [ ] Places API クライアント（キーワード/半径/型の設計）
   - [ ] Distance Matrix API クライアント（距離取得/バッチ化）
-- [ ] スコアリング
-  - [ ] 距離の丸め（有効数字2桁。1km未満はそのまま）
-  - [ ] `総合スコア = (rating × 2) − distance(km)` のユースケース
-  - [ ] 同点時の順位決定ルール（距離優先など）
-- [ ] ランキング生成
-  - [ ] 上位10件の抽出
-  - [ ] 並び替え/タイブレーク/欠損値の扱い
+- [x] スコアリング
+  - [x] 距離の丸め（有効数字2桁。1km未満はそのまま）
+  - [x] `総合スコア = (rating × 2) − distance(km)` のユースケース
+  - [x] 同点時の順位決定ルール（距離優先など）
+- [x] ランキング生成
+  - [x] 上位10件の抽出
+  - [x] 並び替え/タイブレーク/欠損値の扱い（欠損は未対応）
   - [ ] キャッシュ（API 回数と待ち時間削減）
 
 ---
 
 ## M4: UI（ランキング/地図/スポット評価）
 
-- [ ] 画面構成
-  - [ ] Home（ジャンル切替: ALL/IEKEI/JIRO）
-  - [ ] ランキングリスト（スコア/距離/タグ表示）
+- [x] 画面構成（初期雛形）
+  - [x] Home（ジャンル切替: ALL/IEKEI/JIRO）
+  - [x] ランキングリスト（スコア/距離/タグ表示）
   - [ ] 地図ビュー（ピン/選択/詳細）
   - [ ] 詳細モーダル or 詳細画面（任意）
 - [ ] 地図とリストのシームレス切替（トグル/タブ）
-- [ ] スポット評価（上位10の平均 → S/A/B/C/D 表示）
+- [x] スポット評価（上位10の平均 → S/A/B/C/D 表示）
 - [ ] ローディング/エラーステート（再試行/権限誘導）
 - [ ] デザイン（シンプル/視認性/高速操作）
 
@@ -182,12 +182,12 @@
 ## 実装順チェックリスト（短縮版）
 
 1) 初期化
-- [ ] 依存関係追加/設定（Riverpod/AutoRoute/Freezed/Json/build_runner/dotenv）
-- [ ] Lint/Analyzer/フォーマッタ設定
+- [x] 依存関係追加/設定（Riverpod/AutoRoute/Freezed/Json/build_runner/dotenv）
+- [x] Lint/Analyzer/フォーマッタ設定
 
 2) 基盤
-- [ ] ルーティング雛形（Home/Detail）
-- [ ] Provider 雛形（位置/ランキング）
+- [x] ルーティング雛形（Home のみ）
+- [x] Provider 雛形（ランキング）
 - [ ] テーマ/ローカライズ下準備
 
 3) 位置情報/権限
@@ -200,12 +200,12 @@
 
 5) ドメイン/ユースケース
 - [ ] DTO/Entity 生成（Freezed/Json）
-- [ ] スコアリング/並び替え/10件抽出
-- [ ] スポット評価（S/A/B/C/D）
+- [x] スコアリング/並び替え/10件抽出
+- [x] スポット評価（S/A/B/C/D）
 
 6) UI
-- [ ] ジャンル切替（ALL/IEKEI/JIRO）
-- [ ] ランキングリスト（スコア/距離/タグ）
+- [x] ジャンル切替（ALL/IEKEI/JIRO）
+- [x] ランキングリスト（スコア/距離/タグ）
 - [ ] 地図表示/ピン/選択
 - [ ] リスト⇄地図切替
 

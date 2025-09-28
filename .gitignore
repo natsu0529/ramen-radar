@@ -1,0 +1,37 @@
+# Dart & Flutter
+.dart_tool/
+.packages
+pubspec.lock
+
+# Flutter build outputs
+build/
+**/GeneratedPluginRegistrant.*
+
+# iOS
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Pods/
+ios/Podfile.lock
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Podfile.lock
+
+# Web
+web/.dart_tool/
+
+# VSCode & IntelliJ
+.vscode/
+.idea/
+
+# Env
+.env
+

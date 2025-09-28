@@ -1,0 +1,14 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "ramen_radar",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    }
+  ],
+  "generator": "pub",
+  "generatorVersion": "3.8.3",
+  "pubCache": "file:///Users/natsuhirosuzuki/.pub-cache"
+}
