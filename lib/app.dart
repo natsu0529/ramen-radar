@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ramen_radar/l10n/app_localizations.dart';
 import 'features/ranking/presentation/home_page.dart';
 import 'shared/theme/app_theme.dart';
 

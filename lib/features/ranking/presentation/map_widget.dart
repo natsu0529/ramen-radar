@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ramen_radar/l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gmap;
 
 import '../../../models.dart';
