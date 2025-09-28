@@ -89,6 +89,30 @@ fvm flutter devices
 fvm flutter run -d <device-id>
 ```
 
+## アイコン/スプラッシュ生成
+
+`assets/icons/app_icon.png` を配置したうえで、以下のコマンドを実行します。
+
+```bash
+fvm flutter pub run flutter_launcher_icons
+fvm flutter pub run flutter_native_splash:create
+```
+
+※ プラットフォームフォルダ（`android/`, `ios/` など）が必要です。
+
+## スクリーンショット
+
+`docs/screenshots/` に端末別のスクリーンショットを配置してください。
+- 推奨: `home_list.png`, `home_map.png`, `detail_sheet.png`
+
+## リリース手順（概要）
+
+1. バージョン更新（`pubspec.yaml`）と `docs/RELEASE_NOTES.md` 追記
+2. アイコン/スプラッシュ反映（上記コマンド）
+3. スクショ撮影・`README.md` への掲載
+4. ストア用設定（アプリ名/バンドルID/署名 等）
+5. 配布前の最終動作確認（API キー/権限/リージョン設定）
+
 ## Google API 実装の切替（任意）
 
 デフォルトはモックデータを使用します。Google API 実装を使用する場合は、`dart-define` を指定してください。

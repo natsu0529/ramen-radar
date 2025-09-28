@@ -141,4 +141,25 @@ GOOGLE_MAPS_API_KEY="あなたのAPIキー"
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
+### 実行（クイック）
+
+```bash
+fvm flutter create . --platforms=android,ios,web
+fvm flutter pub get
+fvm dart run scripts/inject_maps_keys.dart
+fvm flutter run -d <device-id>
+```
+
+Google API 実装を使用する場合:
+
+```bash
+fvm flutter run --dart-define=USE_GOOGLE_API=true -d <device-id>
+```
+
+アイコン/スプラッシュ生成（要: `assets/icons/app_icon.png`）:
+
+```bash
+fvm flutter pub run flutter_launcher_icons
+fvm flutter pub run flutter_native_splash:create
+```
 
