@@ -31,7 +31,7 @@ class PlaceDetailSheet extends StatelessWidget {
                     children: [
                       Text(entry.place.name, style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 4),
-                      Text('${t.rating(entry.place.rating.toStringAsFixed(1))} ・ ${t.distanceKm(_fmtDistance(entry.roundedDistanceKm))} ・ ${t.score(entry.score.toStringAsFixed(2))}'),
+                      Text('${t.rating(entry.place.rating?.toStringAsFixed(1) ?? 'N/A')} ・ ${t.distanceKm(_fmtDistance(entry.roundedDistanceKm))} ・ ${t.score(entry.score.toStringAsFixed(2))}'),
                     ],
                   ),
                 ),
@@ -82,10 +82,6 @@ class _TagsRow extends StatelessWidget {
         return '家系';
       case RamenTag.jiro:
         return '二郎系';
-      case RamenTag.miso:
-        return '味噌';
-      case RamenTag.tonkotsu:
-        return '豚骨';
     }
   }
 }

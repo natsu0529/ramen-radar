@@ -10,8 +10,6 @@ enum Genre {
 enum RamenTag {
   iekei,
   jiro,
-  miso,
-  tonkotsu,
 }
 
 class LatLng {
@@ -23,17 +21,49 @@ class LatLng {
 class Place {
   final String id; // e.g., Google Place ID
   final String name;
-  final double rating; // 0..5
+  final double? rating; // 0..5
   final LatLng location;
   final List<RamenTag> tags;
+  final int? userRatingsTotal;
+  final int? priceLevel;
+  final String? vicinity;
+  final String? photoReference;
 
   const Place({
     required this.id,
     required this.name,
-    required this.rating,
+    this.rating,
     required this.location,
     this.tags = const [],
+    this.userRatingsTotal,
+    this.priceLevel,
+    this.vicinity,
+    this.photoReference,
   });
+
+  Place copyWith({
+    String? id,
+    String? name,
+    double? rating,
+    LatLng? location,
+    List<RamenTag>? tags,
+    int? userRatingsTotal,
+    int? priceLevel,
+    String? vicinity,
+    String? photoReference,
+  }) {
+    return Place(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      rating: rating ?? this.rating,
+      location: location ?? this.location,
+      tags: tags ?? this.tags,
+      userRatingsTotal: userRatingsTotal ?? this.userRatingsTotal,
+      priceLevel: priceLevel ?? this.priceLevel,
+      vicinity: vicinity ?? this.vicinity,
+      photoReference: photoReference ?? this.photoReference,
+    );
+  }
 }
 
 /// A nearby candidate place with pre-computed distance from the user.

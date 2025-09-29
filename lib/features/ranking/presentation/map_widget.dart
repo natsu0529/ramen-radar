@@ -21,7 +21,7 @@ Widget defaultMapWidgetBuilder({
             position: gmap.LatLng(e.place.location.lat, e.place.location.lng),
             infoWindow: gmap.InfoWindow(
               title: e.place.name,
-              snippet: '★${e.place.rating.toStringAsFixed(1)} / ${e.roundedDistanceKm.toStringAsFixed(2)}km / ${e.score.toStringAsFixed(2)}',
+              snippet: '★${(e.place.rating ?? 0.0).toStringAsFixed(1)} / ${e.roundedDistanceKm.toStringAsFixed(2)}km / ${e.score.toStringAsFixed(2)}',
               onTap: () => onSelect(e),
             ),
           ))

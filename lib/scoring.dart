@@ -39,7 +39,7 @@ String spotGradeFromAverage(double avg) {
 List<RankingEntry> computeRanking(List<Candidate> candidates) {
   final entries = candidates.map((c) {
     final rd = roundDistanceKm(c.distanceKm);
-    final score = computeScore(rating: c.place.rating, roundedDistanceKm: rd);
+    final score = computeScore(rating: c.place.rating ?? 0.0, roundedDistanceKm: rd);
     return RankingEntry(place: c.place, score: score, roundedDistanceKm: rd);
   }).toList();
 

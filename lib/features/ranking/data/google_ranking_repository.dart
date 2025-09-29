@@ -52,7 +52,7 @@ class GoogleRankingRepository implements RankingRepository {
       }
     }
     // Respect Distance Matrix element limits (25 per origin on free tier); truncate to top 25 by rating
-    final limited = [...places]..sort((a, b) => b.rating.compareTo(a.rating));
+    final limited = [...places]..sort((a, b) => (b.rating ?? 0.0).compareTo(a.rating ?? 0.0));
     final top = limited.take(25).toList();
 
     // Distances with per-destination cache
