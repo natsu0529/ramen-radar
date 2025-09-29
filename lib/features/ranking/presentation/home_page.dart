@@ -214,7 +214,7 @@ class _RankingList extends StatelessWidget {
                 final chipBg = scoreColor(color, e.score).withValues(alpha: 0.15);
                 final chipFg = scoreColor(color, e.score);
                 return Semantics(
-                  label: '${e.place.name}, ${t.rating(e.place.rating.toStringAsFixed(1))}, ${t.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
+                  label: '${e.place.name}, ${t.rating((e.place.rating ?? 0.0).toStringAsFixed(1))}, ${t.distanceKm(_fmtDistance(e.roundedDistanceKm))}',
                   button: true,
                   child: ListTile(
                     leading: Container(
@@ -235,7 +235,7 @@ class _RankingList extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${t.rating(e.place.rating.toStringAsFixed(1))}・${t.distanceKm(_fmtDistance(e.roundedDistanceKm))}'),
+                        Text('${t.rating((e.place.rating ?? 0.0).toStringAsFixed(1))}・${t.distanceKm(_fmtDistance(e.roundedDistanceKm))}'),
                         if (e.place.tags.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
@@ -322,10 +322,6 @@ String _tagLabel(RamenTag t) {
       return '家系';
     case RamenTag.jiro:
       return '二郎系';
-    case RamenTag.miso:
-      return '味噌';
-    case RamenTag.tonkotsu:
-      return '豚骨';
   }
 }
 

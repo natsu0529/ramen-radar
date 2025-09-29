@@ -19,8 +19,6 @@ class MockRankingRepository implements RankingRepository {
       Place(id: '1', name: '麺匠 一輝', rating: 4.5, location: LatLng(current.lat + 0.002, current.lng + 0.002), tags: const []),
       Place(id: '2', name: '家系 武蔵屋', rating: 4.2, location: LatLng(current.lat + 0.004, current.lng - 0.001), tags: const [RamenTag.iekei]),
       Place(id: '3', name: '二郎系 雷神', rating: 4.0, location: LatLng(current.lat - 0.006, current.lng + 0.003), tags: const [RamenTag.jiro]),
-      Place(id: '4', name: '味噌 銀河', rating: 4.4, location: LatLng(current.lat + 0.010, current.lng + 0.010), tags: const [RamenTag.miso]),
-      Place(id: '5', name: '豚骨 天神', rating: 4.3, location: LatLng(current.lat + 0.020, current.lng - 0.005), tags: const [RamenTag.tonkotsu]),
     ];
 
     final filtered = base.where((p) {
