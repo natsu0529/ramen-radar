@@ -43,3 +43,7 @@ web/.dart_tool/
 
 # FVM (Flutter Version Manager)
 .fvm/flutter_sdk/
+
+# Android keystore and signing config (do not commit)
+key.properties
+*.jks

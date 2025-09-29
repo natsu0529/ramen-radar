@@ -2,12 +2,15 @@ import java.io.FileInputStream
 import java.util.Properties
 import java.io.File
 
-// 1. key.propertiesを読み込むためのコード
-//    project.rootDir (プロジェクトの最上位ディレクトリ) から key.properties を参照します。
-val keystoreProperties = File(project.rootDir, "key.properties")
+// 1. key.properties を複数候補パスから読み込む（android 配下 or リポジトリ直下）
 val properties = Properties()
-if (keystoreProperties.exists()) {
-    // ファイルが存在する場合のみ読み込む
+val keyPropsCandidates = listOf(
+    File(rootProject.rootDir, "key.properties"),                 // android/key.properties
+    File(rootProject.rootDir.parentFile, "key.properties"),      // repo-root/key.properties
+    File(project.rootDir, "key.properties")                      // android/app/key.properties
+)
+val keystoreProperties: File? = keyPropsCandidates.firstOrNull { it.exists() }
+if (keystoreProperties != null) {
     properties.load(FileInputStream(keystoreProperties))
 }
 
@@ -23,7 +26,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ramen_radar"
+    namespace = "com.suzukioff.ramenradar"
     compileSdk = flutter.compileSdkVersion
     
     // NDKのバージョン固定は外し、環境にあるNDKを使用
@@ -39,7 +42,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.ramen_radar"
+        applicationId = "com.suzukioff.ramenradar"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -81,7 +84,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             } else {
                 // 必須情報が無ければ未署名でビルド（後でPlay Consoleで署名する場合等）
-                logger.lifecycle("[android] Release signing skipped: missing key.properties entries.")
+                logger.lifecycle("[android] Release signing skipped: missing key.properties entries. Checked: ${keyPropsCandidates.joinToString()}")
             }
 
             // NDKが無い環境でのビルドを安定化: ネイティブのデバッグシンボル生成を無効化
