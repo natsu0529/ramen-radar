@@ -12,7 +12,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appTitle => 'Ramen Radar';
 
   @override
-  String get genreAll => 'ALL';
+  String get genreAll => '全て';
 
   @override
   String get genreIekei => '家系';
